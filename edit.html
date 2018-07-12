@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Dragon Box</title>
+        <style>
+            html, body {
+                margin: 0;
+                background-color: #000;
+                width: 100%;
+                height: 100%;
+                color: white;
+                height: 100%;
+                display: flex;
+                align-items: stretch;
+                flex-direction: column;
+            }
+            
+            #canvasHolder {
+                flex: 1;
+                display: flex;
+                align-items: stretch;
+            }
+
+            #canvas {
+                border: 1px solid black;
+                position: relative;
+                flex: 1;
+            }
+            
+            #palette {
+                display: block;
+            }
+            
+            #editor {
+                flex: 1;
+                background-color: #ddd;
+                color: black;
+                padding: 5px;
+            }
+        </style>
+        <!-- <script src="main.js"></script> -->
+    </head>
+
+    <body>
+        <!--
+        <div id="canvasHolder">
+            <canvas id="canvas" onmousedown="canvasMouseDown(event)" onmouseup="canvasMouseUp(event)" onwheel="zoom(event)" onmousemove="mouseOverCanvas(event)"></canvas>
+        </div>
+        -->
+        <div id="editor">
+            New Map: <input type="number" min="2" max="64" id="mapW" />x<input type="number" min="2" max="64" id="mapH" /> <button type="button" onclick="newMap()" >Create</button> | 
+            Draw Layer: <select id="drawLayer">
+                <option value="0" selected>Floor</option>
+                <option value="1">Mat</option>
+                <option value="2">Solid</option>
+                <option value="3">Semisolid</option>
+                <option value="4">Non-solid</option>
+            </select><br/>
+            <image src="assets/tileset.png" width="256" height="256" id="palette" onmousemove="mouseOverTile(event)" onclick="pickTile(event)" ></image>
+            <div>X: <span id="tileX"></span>, Y: <span id="tileY"></span>, I: <span id="tileIndex"></span>, S: <span id="tileSelected"></span></div>
+        </div>
+        <script src="main.js"></script>
+        <script src="edit.js"></script>
+    </body>
+</html>

@@ -1,0 +1,139 @@
+<class classname="Actor">
+    <function name="addLocation">
+        function addLocation(self, x, y)
+        {
+            call(self, "setLocation", self.x + x, self.y + y);
+        }
+    </function>
+    
+    <function name="setLocation">
+        function jsonUnique(v, i, self)
+        {        
+            return self.map(JSON.stringify).indexOf(JSON.stringify(v)) === i;
+        }
+        
+        function circleIntersect(x1, y1, r1, x2, y2, r2)
+        {
+            return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)) &lt;= r1 + r2;
+        }
+    
+        function setLocation(self, x, y, bounceBack)
+        {
+            let half = {
+                x: (x - self.x) / 2 + self.x,
+                y: (y - self.y) / 2 + self.y
+            };
+        
+            var corners = [
+                [x, y],
+                [x - self.props.radius, y],
+                [x + self.props.radius, y],
+                [x, y + self.props.radius],
+                [x, y - self.props.radius],
+                [x - self.props.radius, y + self.props.radius],
+                [x + self.props.radius, y + self.props.radius],
+                [x + self.props.radius, y - self.props.radius],
+                [x - self.props.radius, y - self.props.radius],
+                [half.x - self.props.radius, half.y],
+                [half.x + self.props.radius, half.y],
+                [half.x, half.y + self.props.radius],
+                [half.x, half.y - self.props.radius],
+                [half.x - self.props.radius, half.y + self.props.radius],
+                [half.x + self.props.radius, half.y + self.props.radius],
+                [half.x + self.props.radius, half.y - self.props.radius],
+                [half.x - self.props.radius, half.y - self.props.radius],
+            ].map(function(x) {
+                return [Math.round(x[0]), Math.round(x[1])]
+            }).filter(jsonUnique);
+            
+            for ( let ci = 0; ci &lt; corners.length; ci++ )
+            {
+                let c = corners[ci];
+                let tcent = [c[0] + 0.5, c[1] + 0.5];
+                let tile = 0;
+            
+                // pre-step. check if solid tile
+                if ( c[0] &gt;= 0 &amp;&amp; c[0] &lt; context.tilemap.width &amp;&amp; c[1] &gt;= 0 &amp;&amp; c[1] &lt; context.tilemap.height )
+                {
+                    tile = c[1] * context.tilemap.width + c[0];
+                   
+                    if ( context.tilemap.tiles[2][tile] == 0 ) // [tile]th Solid layer (Layer 3, or tilemap.tiles[2]) tile    
+                        continue;
+                        
+                    // console.log(self.index, x, y, tcent[0], tcent[1], circleIntersect(x, y, self.props.radius, tcent[0], tcent[1], Math.sqrt(2) / 2));
+                    
+                    // step 1. check circumscribed intersection with this tile
+                    //# if ( !circleIntersect(x, y, self.props.radius, tcent[0], tcent[1], Math.sqrt(2) / 2) )
+                    //#     continue;
+                        
+                    // step 2. check inscribed intersection with this tile
+                    if ( circleIntersect(x, y, self.props.radius, tcent[0], tcent[1], 0.5) )
+                    {
+                        call(self, "hitTile", c[0], c[1]);
+                        
+                        if ( bounceBack )
+                            self.angle = (self.angle + Math.PI) % (Math.PI * 2);
+                        
+                        return false;
+                    }
+                        
+                    // step 3. check if intersection between intercentral line and actor's radius is in tile's AABB
+                    let ix = tcent[0] - x;
+                    let iy = tcent[1] - y;
+                    
+                    let dist = Math.sqrt(Math.pow(ix, 2) + Math.pow(iy, 2));
+                    ix *= self.props.radius * 2 / dist;
+                    iy *= self.props.radius * 2 / dist;
+                    
+                    ix += x;
+                    iy += y;
+                    
+                    if ( ix &gt;= c[0] &amp;&amp; ix &lt;= c[0] + 1 &amp;&amp; iy &gt;= c[1] &amp;&amp; iy &lt;= c[1] + 1 )
+                    {
+                        call(self, "hitTile", c[0], c[1]);
+                        
+                        if ( bounceBack )
+                            self.angle = (self.angle + Math.PI) % (Math.PI * 2);
+                        
+                        return false;
+                    }
+                    
+                    // else console.log(self.index, dist, self.props.radius, ix, iy, c[0], c[1], x, y);
+                }
+                 
+                else {
+                    call(self, "hitVoid", c[0], c[1]);
+                    
+                    if ( bounceBack )
+                        self.angle = (self.angle + Math.PI) % (Math.PI * 2);
+                    
+                    return false;
+                }
+                
+            }
+            
+            self.x = x;
+            self.y = y;
+            
+            return true;
+        }
+    </function>
+    
+    <function name="hitVoid">
+        function hitVoid(self, x, y)
+        {
+            // console.log("V", x, y);
+        }
+    </function>
+    
+    <function name="hitTile">
+        function hitTile(self, x, y)
+        {
+            // console.log("T", x, y);
+        }
+    </function>
+    
+    <properties>
+        <prop key="radius">0.8</prop>
+    </properties>
+</class>

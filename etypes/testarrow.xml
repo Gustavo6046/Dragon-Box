@@ -1,0 +1,64 @@
+<class classname="TestArrow" inherit="Actor">
+    <requirement classname="Actor">etypes/actor.xml</requirement>
+
+    <function name="tick">
+        function tick(self, deltaTime)
+        {
+            self.props.vel[0] = Math.min(self.props.vel[0], 50);
+            self.props.vel[1] = Math.min(self.props.vel[1], 50);
+            self.props.speed = Math.min(self.props.speed, 50);
+            self.props.acceleration = Math.max(Math.min(self.props.acceleration, 50), 50);
+            self.props.turnAngle /= Math.max(1, Math.abs(self.props.turnAngle) / 8);
+            self.angle += deltaTime * Math.PI * self.props.turnAngle;
+            self.angle = self.angle % (Math.PI * 2);
+            self.props.vel[0] += (Math.cos(-self.angle) * deltaTime) * self.props.speed;
+            self.props.vel[1] += (Math.sin(-self.angle) * deltaTime) * self.props.speed;
+            
+            call(self, 'addLocation', self.props.vel[0] * deltaTime, self.props.vel[1] * deltaTime, true);
+            
+            self.props.vel[0] /= 1.3 + deltaTime * 2;
+            self.props.vel[1] /= 1.3 + deltaTime * 2;
+            self.props.turnSpeed /= 1.3 + deltaTime * 2;
+            self.props.turnAngle /= 1.3 + deltaTime * 2;
+            self.props.acceleration /= 1.1 + deltaTime * 5;
+            self.props.turnAngle += self.props.turnSpeed * deltaTime;
+            self.props.speed += self.props.acceleration * deltaTime;
+        }
+    </function>
+    
+    <function name="clicked">
+        function mod(a, n) {
+            return a - Math.floor(a / n) * n;
+        }
+    
+        function clicked(self, tx, ty)
+        {
+            let turnAngle = mod((Math.atan2(ty - self.y, tx - self.x) - Math.atan2(self.props.vel[1], self.props.vel[0]) + Math.PI), (Math.PI * 2)) - Math.PI;
+            let power = Math.sqrt(64 / Math.sqrt(Math.pow((ty - self.y), 2) + Math.pow((tx - self.x), 2)));
+            
+            // console.log(turnAngle);
+            
+            self.props.turnSpeed -= Math.min(Math.max(turnAngle * power, -15), 15);
+            self.props.acceleration = Math.min(Math.max(1 + self.props.acceleration * (5 - (tx - self.x) * self.props.vel[0] * (ty - self.y) * self.props.vel[1] * power), -50), 50);
+        }
+    </function>
+    
+    <function name="init">
+        function init(self, initTime)
+        {
+            self.sprite = "testarrow"
+            self.angle += Math.PI * 2 * Math.random();
+            self.angle = self.angle % Math.PI * 2;
+        }
+    </function>
+    
+    <properties>
+        <prop key="clickRadius">900</prop>
+        <prop key="turnAngle">1</prop>
+        <prop key="turnSpeed">0</prop>
+        <prop key="vel">[0, 0]</prop>
+        <prop key="speed">5</prop>
+        <prop key="acceleration">0</prop>
+        <prop key="radius">0.6</prop>
+    </properties>
+</class>

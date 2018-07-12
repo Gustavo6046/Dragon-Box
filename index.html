@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Dragon Box</title>
+        <style>
+            html, body {
+                margin: 0;
+                background-color: #383028;
+                color: white;
+                height: 100%;
+            }
+            
+            html {
+                height: 100%;
+                width: 100%;
+                display: flex;
+                align-items: stretch;
+            }
+            
+            body {
+                flex: 1;
+                display: flex;
+                align-items: stretch;
+            }
+            
+            #canvasHolder {
+                flex: 1;
+                display: flex;
+                align-items: stretch;
+            }
+
+            #canvas {
+                max-width: 100%;
+                flex: 1;
+                background-color: #000;
+                border: 4px ridge #980;
+                box-sizing: border-box;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="canvasHolder" onmouseup="let x = event.clientX - this.getBoundingClientRect().left; let y = event.clientY - this.getBoundingClientRect().top; canvasClick(x, y, x / display.tile_size + display.pan[0], y / display.tile_size + display.pan[1])">
+            <canvas id="canvas"></canvas>
+        </div>
+        <script src="main.js"></script>
+        <script>
+            c = document.getElementById('canvas');
+            
+            c.tabIndex = 1000;
+            
+            canvas.addEventListener('keydown', function(event) {
+                if ( input.indexOf(event.code) == -1 ) input.push(event.code);
+                
+                keyPress(event.code);
+            })
+            
+            canvas.addEventListener('keyup', function(event) {
+                if ( input.indexOf(event.code) > -1 )
+                    input.splice(input.indexOf(event.code), 1);
+            })
+            
+            canvas.style.outline = "none";
+            
+            entityType("etypes/testarrow.xml", function(etype) {
+                initialize("tilemaps/test3.dat", function() {
+                    for ( let _ = 0; _ < 30; _++ )
+                        spawnEntity(etype.name, 10, 6);
+                        
+                    setInterval(tick, 1000 / 30);
+                });
+            });
+            
+        </script>
+    </body>
+</html>
